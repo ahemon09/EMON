@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMON | Cyberpunk Portfolio</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* === CSS VARIABLES & RESET === */
+        :root {
+            --bg-base: #030305;
+            --neon-cyan: #00f0ff;
+            --neon-purple: #bc13fe;
+            --electric-blue: #0424d9;
+            --text-light: #ffffff;
+            --text-dim: #a0a0b0;
+            --glass-bg: rgba(10, 10, 20, 0.4);
+            --glass-border: rgba(0, 240, 255, 0.2);
+            --font-head: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-light);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            font-size: 18px;
+        }
+
+        /* === CUSTOM SCROLLBAR === */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-purple);
+        }
+
+        /* === LOADING SCREEN === */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-base);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid transparent;
+            border-top: 4px solid var(--neon-cyan);
+            border-bottom: 4px solid var(--neon-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* === BACKGROUND EFFECTS === */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            background: radial-gradient(circle at center, #111 0%, var(--bg-base) 100%);
+        }
+        
+        .mouse-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: -1;
+            transition: background 0.3s;
+        }
+
+        /* === NAVIGATION === */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+        }
+        .logo {
+            font-family: var(--font-head);
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--text-light);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-family: var(--font-head);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: var(--neon-purple);
+            transition: width 0.3s;
+            box-shadow: 0 0 10px var(--neon-purple);
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a:hover { color: var(--neon-purple); }
+
+        /* === LAYOUT & SECTIONS === */
+        section {
+            min-height: 100vh;
+            padding: 100px 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .section-title {
+            font-family: var(--font-head);
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--neon-cyan);
+            position: relative;
+        }
+        .section-title::before {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            color: var(--neon-cyan);
+            filter: blur(8px);
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        /* === HERO SECTION === */
+        #hero {
+            align-items: flex-start;
+            position: relative;
+        }
+        .hero-content h1 {
+            font-family: var(--font-head);
+            font-size: 80px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+        .hero-content h1 span {
+            color: var(--neon-cyan);
+        }
+        .typewriter {
+            font-size: 24px;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+            height: 30px;
+        }
+        .typewriter span {
+            border-right: 2px solid var(--neon-purple);
+            padding-right: 5px;
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink { 50% { border-color: transparent; } }
+
+        /* RGB Animated Button */
+        .cyber-btn {
+            position: relative;
+            padding: 15px 40px;
+            background: transparent;
+            color: var(--text-light);
+            font-family: var(--font-head);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            overflow: hidden;
+            z-index: 1;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple), var(--electric-blue));
+            z-index: -2;
+            background-size: 400%;
+            animation: rgbFlow 3s linear infinite;
+        }
+        .cyber-btn::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px; right: 2px; bottom: 2px;
+            background: var(--bg-base);
+            z-index: -1;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+            transition: 0.3s;
+        }
+        .cyber-btn:hover::after {
+            background: transparent;
+        }
+        @keyframes rgbFlow { 0% { background-position: 0 0; } 100% { background-position: 400% 0; } }
+
+        .social-icons {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+        }
+        .social-icons a {
+            color: var(--text-light);
+            font-size: 24px;
+            transition: 0.3s;
+        }
+        .social-icons a:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px var(--neon-cyan);
+            transform: translateY(-5px);
+        }
+
+        /* === ABOUT SECTION === */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(188, 19, 254, 0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+        .about-text p {
+            color: var(--text-dim);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        .stats-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .stat-box {
+            text-align: center;
+        }
+        .stat-box h3 {
+            font-family: var(--font-head);
+            font-size: 36px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* === SKILLS SECTION === */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .skill-card {
+            background: var(--glass-bg);
+            border: 1px solid rgba(188, 19, 254, 0.3);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .skill-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.2);
+        }
+        .skill-icon {
+            font-size: 40px;
+            color: var(--neon-cyan);
+            margin-bottom: 15px;
+        }
+        .progress-wrap {
+            width: 100%;
+            height: 6px;
+            background: #222;
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            width: 0;
+            transition: width 1.5s ease-out;
+        }
+
+        /* === PROJECTS SECTION === */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        .project-card {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            group: hover;
+        }
+        .project-img {
+            width: 100%;
+            height: 200px;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--font-head);
+            color: #333;
+            transition: 0.5s;
+        }
+        .project-info {
+            padding: 25px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid var(--neon-cyan);
+            transition: 0.4s;
+        }
+        .project-card:hover .project-img {
+            transform: scale(1.05);
+            opacity: 0.5;
+        }
+        .project-card:hover {
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.2);
+        }
+        .project-tags {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .tag {
+            font-size: 12px;
+            padding: 3px 8px;
+            border: 1px solid var(--neon-purple);
+            border-radius: 4px;
+            color: var(--neon-purple);
+        }
+
+        /* === CONTACT SECTION === */
+        .contact-wrap {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
+            color: var(--text-light);
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #333;
+            outline: none;
+            font-family: var(--font-body);
+            transition: 0.3s;
+        }
+        .input-group label {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            color: var(--text-dim);
+            font-size: 16px;
+            pointer-events: none;
+            transition: 0.3s;
+            font-family: var(--font-head);
+        }
+        .input-group input:focus ~ label,
+        .input-group input:valid ~ label,
+        .input-group textarea:focus ~ label,
+        .input-group textarea:valid ~ label {
+            top: -20px;
+            font-size: 12px;
+            color: var(--neon-cyan);
+        }
+        .input-group input:focus, .input-group textarea:focus {
+            border-bottom: 2px solid var(--neon-cyan);
+            box-shadow: 0 2px 10px rgba(0, 240, 255, 0.2);
+        }
+
+        /* === FOOTER === */
+        footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--glass-border);
+            background: var(--bg-base);
+            font-family: var(--font-head);
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+        footer span {
+            color: var(--neon-purple);
+        }
+
+        /* === ANIMATIONS (Scroll Reveal) === */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero-content h1 { font-size: 50px; }
+            .about-grid { grid-template-columns: 1fr; }
+            section { padding: 80px 5%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Background Elements -->
+    <canvas id="particles-js"></canvas>
+    <div class="mouse-glow" id="mouse-glow"></div>
+
+    <!-- Navbar -->
+    <nav>
+        <a href="#" class="logo">EMON</a>
+        <ul class="nav-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="hero-content reveal">
+            <h1>HI, I'M <span>EMON</span></h1>
+            <div class="typewriter">
+                <span id="type-text"></span>
+            </div>
+            <a href="#projects" class="cyber-btn">INITIALIZE_PORTFOLIO</a>
+            
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <h2 class="section-title" data-text="SYSTEM_INFO">SYSTEM_INFO</h2>
+        <div class="about-grid reveal">
+            <div class="glass-card">
+                <i class="fas fa-user-astronaut" style="font-size: 60px; color: var(--neon-purple); margin-bottom: 20px;"></i>
+                <h3 style="font-family: var(--font-head); margin-bottom: 15px;">Frontend Dev // Mobile Gamer</h3>
+                <div class="about-text">
+                    <p>Building high-performance, dark-luxe aesthetic websites and interactive web applications. When I'm not writing code, I'm optimizing sensitivity configs and dominating lobbies.</p>
+                    <p>Based in Bangladesh, ready for global deployment.</p>
+                </div>
+            </div>
+            <div class="stats-container">
+                <div class="stat-box glass-card" style="width: 100%;">
+                    <h3>100+</h3>
+                    <p style="color: var(--text-dim);">GitHub Commits</p>
+                </div>
+                <div class="stat-box glass-card" style="width: 100%;">
+                    <h3>99%</h3>
+                    <p style="color: var(--text-dim);">Headshot Rate</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills">
+        <h2 class="section-title" data-text="CORE_MODULES">CORE_MODULES</h2>
+        <div class="skills-grid reveal">
+            <div class="skill-card">
+                <i class="fab fa-html5 skill-icon"></i>
+                <h3 style="font-family: var(--font-head);">HTML/CSS</h3>
+                <div class="progress-wrap"><div class="progress-bar" data-width="95%"></div></div>
+            </div>
+            <div class="skill-card">
+                <i class="fab fa-js skill-icon"></i>
+                <h3 style="font-family: var(--font-head);">JavaScript</h3>
+                <div class="progress-wrap"><div class="progress-bar" data-width="85%"></div></div>
+            </div>
+            <div class="skill-card">
+                <i class="fas fa-gamepad skill-icon"></i>
+                <h3 style="font-family: var(--font-head);">UI/UX Design</h3>
+                <div class="progress-wrap"><div class="progress-bar" data-width="90%"></div></div>
+            </div>
+            <div class="skill-card">
+                <i class="fas fa-microchip skill-icon"></i>
+                <h3 style="font-family: var(--font-head);">Optimization</h3>
+                <div class="progress-wrap"><div class="progress-bar" data-width="88%"></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <h2 class="section-title" data-text="DEPLOYMENTS">DEPLOYMENTS</h2>
+        <div class="projects-grid reveal">
+            <div class="project-card">
+                <div class="project-img">[ IMAGE RENDER ]</div>
+                <div class="project-info">
+                    <h3 style="font-family: var(--font-head); margin-bottom: 10px;">Dark-Luxe Portfolio</h3>
+                    <p style="color: var(--text-dim); font-size: 15px;">A personal web portfolio utilizing modern hex themes and GitHub Pages deployment.</p>
+                    <div class="project-tags">
+                        <span class="tag">HTML</span>
+                        <span class="tag">CSS</span>
+                        <span class="tag">JS</span>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-img">[ IMAGE RENDER ]</div>
+                <div class="project-info">
+                    <h3 style="font-family: var(--font-head); margin-bottom: 10px;">Automated Timer Config</h3>
+                    <p style="color: var(--text-dim); font-size: 15px;">Programmed automation sequences for digital timer interfaces.</p>
+                    <div class="project-tags">
+                        <span class="tag">Logic</span>
+                        <span class="tag">Hardware</span>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-img">[ IMAGE RENDER ]</div>
+                <div class="project-info">
+                    <h3 style="font-family: var(--font-head); margin-bottom: 10px;">Gamer Profile Dashboard</h3>
+                    <p style="color: var(--text-dim); font-size: 15px;">Stat-tracking UI with responsive sensitivity calculators.</p>
+                    <div class="project-tags">
+                        <span class="tag">Web App</span>
+                        <span class="tag">UI Design</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2 class="section-title" data-text="TRANSMIT_DATA">TRANSMIT_DATA</h2>
+        <div class="contact-wrap glass-card reveal">
+            <form id="contact-form">
+                <div class="input-group">
+                    <input type="text" required>
+                    <label>Identification_Name</label>
+                </div>
+                <div class="input-group">
+                    <input type="email" required>
+                    <label>Network_Address (Email)</label>
+                </div>
+                <div class="input-group">
+                    <textarea rows="4" required></textarea>
+                    <label>Message_Payload</label>
+                </div>
+                <button type="submit" class="cyber-btn" style="width: 100%;">SEND_TRANSMISSION</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Developed by <span>EMON</span>. All Systems Operational.</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Loader ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+            }, 1000);
+        });
+
+        // --- Mouse Glow Effect ---
+        const glow = document.getElementById('mouse-glow');
+        document.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // --- Typewriter Effect ---
+        const words = ["Web Developer", "UI/UX Enthusiast", "Mobile Gamer", "Tech Explorer"];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typeTarget = document.getElementById('type-text');
+
+        function type() {
+            const currentWord = words[wordIndex];
+            if (isDeleting) {
+                typeTarget.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typeTarget.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 50 : 100;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                typeSpeed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                typeSpeed = 500;
+                }
+
+            setTimeout(type, typeSpeed);
+        }
+        setTimeout(type, 1500);
+
+        // --- Scroll Reveal & Skill Bar Animation ---
+        const reveals = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            let windowHeight = window.innerHeight;
+            let revealPoint = 150;
+
+            reveals.forEach(reveal => {
+                let revealTop = reveal.getBoundingClientRect().top;
+                if (revealTop < windowHeight - revealPoint) {
+                    reveal.classList.add('active');
+                    
+                    const bars = reveal.querySelectorAll('.progress-bar');
+                    bars.forEach(bar => {
+                        bar.style.width = bar.getAttribute('data-width');
+                    });
+                }
+            });
+        };
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+
+        // --- Simple Particle Canvas System ---
+        const canvas = document.getElementById('particles-js');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
+        const colors = ['#00f0ff', '#bc13fe', '#0424d9'];
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.005;
+                
+                if(this.x < 0) this.x = canvas.width;
+                if(this.x > canvas.width) this.x = 0;
+                if(this.y < 0) this.y = canvas.height;
+                if(this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numParticles = (canvas.width * canvas.height) / 10000;
+            for (let i = 0; i < numParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                
+                if(particlesArray[i].size <= 0.2) {
+                    particlesArray[i].size = Math.random() * 2 + 0.5;
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        });
+
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Transmission sent successfully.');
+        });
+    </script>
+</body>
+</html>
